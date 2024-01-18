@@ -121,13 +121,106 @@ int search(NODE *root)
 	}
 	return -1;
 }
+NODE *recursive_insert(NODE *root,int num)
+{
+	NODE *newnode,*temp,*parent;
+	int n,i;
+	newnode=(NODE*)malloc(sizeof(NODE));
+	newnode->data=num;
+	newnode->left=NULL;
+	newnode->right=NULL;
+	if(root==NULL)
+	{
+			root=newnode;
+			return root;
+	}
+	temp=root;
+	if(newnode->data<temp->data)
+		temp->left=recursive_insert(temp->left,num);
+	else
+		temp->right=recursive_insert(temp->right,num);
+	return root;
+}
+NODE *delete(NODE* root,int key)
+{
+	NODE *temp;
+	if(root==NULL)
+	{
+		return root;
+	}
+	if(key<root->data)
+		root->left=delete(root->left,key);
+	else if(key>root->data)
+		root->right=delete(root->right,key);
+	else
+	{
+		if(root->left==NULL)
+		{
+			temp=root->right;
+			free(root);
+			return temp;
+		}
+		else if(root->right==NULL)
+		{
+			temp=root->left;
+			free(root);
+			return temp;
+		}
+		temp=root->right;
+		while(temp && temp->left!=NULL)
+		{
+			temp=temp->left;
+		}
+		root->data=temp->data;
+		root->right=delete(root->right,temp->data);
+	}
+	return root;
+}
+int Count_total_nodes(NODE *root)
+{
+	static int count=0;
+	NODE *temp=root;
+	if(temp!=NULL)
+	{
+		count++;
+		Count_total_nodes(temp->left);
+		Count_total_nodes(temp->right);
+	}
+    return count;
+}
+int Count_leaf_nodes(NODE *root)
+{
+	static int count=0;
+	NODE *temp=root;
+	if(temp!=NULL)
+	{
+		if((temp->left==NULL)&&(temp->right==NULL))
+			count++;
+		Count_total_nodes(temp->left);
+		Count_total_nodes(temp->right);
+	}
+	return count;
+}
+int Count_NON_leaf_nodes(NODE *root)
+{
+	static int count=0;
+	NODE *temp=root;
+	if(temp!=NULL)
+	{
+		if((temp->left==NULL)||(temp->right==NULL))
+			count++;
+		Count_total_nodes(temp->left);
+		Count_total_nodes(temp->right);
+	}
+	return count;
+}
 int main()
 {
-	int ch,ans;
+	int ch,ans,num,key;
 	NODE *root=NULL;
 	do
 	{
-		printf("\n\n1-create\n2-preorder\n3-inorder\n4-postorder\n5-insert\n6-search\nEnter choice::");
+		printf("\n\n1-create\n2-preorder\n3-inorder\n4-postorder\n5-insert\n6-search\n7-recursive insert\n8-delete\n9-count total nodes\n10-count leaf node\n11-count non leaf node\nEnter choice::");
 		scanf("%d",&ch);
 		switch(ch)
 		{
@@ -146,7 +239,22 @@ int main()
 						printf("Not Found");
 					else
 						printf("Found");
-					break;										
+					break;
+		    case 7 :printf("\nEnter Value::");
+					scanf("%d",&num);
+					root=recursive_insert(root,num);
+					break;	
+			case 8 :printf("\nEnter Value::");
+					scanf("%d",&key);
+					root=delete(root,key);
+					break;
+			case 9 :
+			        printf("\nCount Total node = %d",Count_total_nodes(root));
+			        break;
+			case 10 :printf("\nCount Leaf Node = %d",Count_leaf_nodes(root));
+			        break;
+			case 11:printf("\nCount Non Leaf Node = %d",Count_NON_leaf_nodes(root));
+			        break;		 																						
 		}
-	}while(ch<7);
+	}while(ch<15);
 }
